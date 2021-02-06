@@ -42,11 +42,11 @@ class Validator {
         if ($name != null && $type != null){
             $definedVar = !(isset($name) && empty($name)) 
                 && !($this->method($name) != null)
-                && empty($_POST[$name]);
+                && empty(method[$name]);
 
         }
 
-        if (!$defined){
+        if (!$definedVar){
             $this->putError($param, "undefined");
         }
     }
@@ -77,14 +77,42 @@ class Validator {
 
   
 
-    public function allowedType($type){
+    public function allowedType($type): bool{
         return isset($this->typesAllowed[$type]);
     }
 
 
+    public function inRange($param){
+        if (!$this->existError($param['name'])) {
 
-    // separar error de esta clase
-    private function existError($paramName){
+            $max = $param['max'];
+            $min = $param['min'];
+            $value = $this->method($param['name']);
+            $lenght = 0;
+
+            if (is_string($value)) {
+                $lenght = strlen($value);
+            }
+
+            if (is_numeric($value)) {
+                $lenght = $value;
+            }
+
+            if (!$sizeValid($param)) {
+                $this->putError($param, "Out of range(max=$max, min=$min)");
+            }
+
+        }
+    }
+
+
+    public function sizeValid(int $lenght):bool {
+
+        return $lenght >= $min && $lenght <= $max;
+
+    }
+
+    private function existError($paramName):bool{
         return isset(errors[$paramName]);
     }
 
@@ -105,8 +133,7 @@ class Validator {
 
 
 
-    private function post($paramName)
-    {
+    private function post($paramName){
         return $_POST[$name];
     }
 
@@ -115,7 +142,9 @@ class Validator {
 $name = [
     "name" => 'name',
     'message' => 'default',
-    'type'=> 'string'
+    'type'=> 'string',
+    'max'=> 5,
+    'min'=> 10
 ];
 
 $params = [$name,];
