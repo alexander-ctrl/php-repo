@@ -29,6 +29,15 @@ body {
     position: relative;
 }
 
+.error {
+    width: 100%;
+    text-align: center;
+    margin: 2px 0px;
+    padding: 5px;
+    border: solid 1px rgb(243, 54, 54);
+    color: rgb(243, 54, 54);
+}
+
 #contact input[type="text"],
 #contact input[type="email"],
 #contact input[type="tel"],

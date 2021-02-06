@@ -5,8 +5,10 @@ class Validator {
     private $errors = [];
     private $params = [];
     private $defaultMessage = "Invalid field";
-    private $method = "post";
-    private $typesAllowed = ['str', 'double', 'int', 'float'];
+    private $typesAllowed = ['string', 'double', 'int', 'float'];
+
+    public function __construct(private string $method){
+    }
 
     public function valid(array $params = null): bool{
         $this->params = $params;
@@ -20,10 +22,15 @@ class Validator {
 
 
     public function correct(): bool{
-        foreach($this->params as $param){
+        foreach($this->params as $key => $value){
+            $param = $value;
+            $param['name'] = $key; 
+
+            // Puede cambiarse por clases
             $this->defined($param);
             $this->typed($param);
             $this->inRange($param);
+            $this->filterVars($param);
         }
 
         return count($this->errors) == 0;
@@ -38,11 +45,11 @@ class Validator {
         $name = isset($param['name']) ? $param['name']: null;
         $type = isset($param['type']) ? $param['type']: null;
         $definedVar = false;
-
+        
         if ($name != null && $type != null){
-            $definedVar = !(isset($name) && empty($name)) 
-                && !($this->method($name) != null)
-                && empty($this->method($name));
+            $result = $this->method($name);
+
+            $definedVar = isset($result) && !empty($result);
 
         }
 
@@ -61,7 +68,8 @@ class Validator {
 
             $value = $this->method($name); 
 
-            if ($this->allowedType($type)) {
+            if ($this->allowedType($type)){
+
                 $validType = "is_".$type;
 
                 if (!$validType($value)){
@@ -75,18 +83,25 @@ class Validator {
         }
     }
 
+
   
 
     public function allowedType($type): bool{
-        return isset($this->typesAllowed[$type]);
+        $result = array_search($type, $this->typesAllowed);
+        return isset($result); 
     }
 
+
+    
 
     public function inRange($param){
         if (!$this->existError($param['name'])) {
 
-            $max = $param['max'];
-            $min = $param['min'];
+            $max = isset($param['max']) ? $param['max']: null;
+            $min = isset($param['min']) ? $param['min']: null;
+
+            if($max == null || $min == null) return;
+
             $value = $this->method($param['name']);
             $lenght = 0;
 
@@ -106,11 +121,34 @@ class Validator {
     }
 
 
+
+
     public function sizeValid(int $min, int $max, int $lenght):bool {
-
         return $lenght >= $min && $lenght <= $max;
-
     }
+
+
+
+    public function filterVars($param){
+
+        if(!$this->existError($param['name'])){
+            $name = $param['name'];
+            $value = $this->method($name);
+
+            if ($name == "email"){
+                if(!filter_var($value, FILTER_VALIDATE_EMAIL)){
+                    $this->putError($param);
+                }
+            }
+
+            if ($name == "url"){
+                if(!filter_var($value, FILTER_VALIDATE_URL)){
+                    $this->putError($param);
+                }
+            }
+        }
+    }
+
 
     private function existError($paramName):bool{
         return isset($this->errors[$paramName]);
@@ -118,27 +156,39 @@ class Validator {
 
 
 
-
-    public function putError($param, $messageExtra){
+    public function putError($param, $messageExtra=""){
         $name = $param['name'];
         $message = $param['message'];
 
         if ($message == null || $message == "default") {
-            $message = $this->defaultMessage . ": " . $messageExtra;;
+            $message = $this->defaultMessage . " " . $messageExtra;;
         } 
 
-        $errors[$name] = $message; 
+        $this->errors[$name] = $message; 
+    }
+
+    public function getErrors():array{
+        return $this->errors;
     }
 
 
     private function method($paramName) {
         if ($this->method == "post") {
-            $this->post($paramName);
+            return $this->post($paramName);
         }
 
+        if($this->method == "get"){
+            return $this->get($paramName);
+        }
     }
+
+
     private function post($paramName){
         return $_POST[$paramName];
+    }
+    
+    private function get($paramName){
+        return $_GET[$paramName];
     }
 
 }
