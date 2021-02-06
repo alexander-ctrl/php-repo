@@ -42,7 +42,7 @@ class Validator {
         if ($name != null && $type != null){
             $definedVar = !(isset($name) && empty($name)) 
                 && !($this->method($name) != null)
-                && empty(method[$name]);
+                && empty($this->method($name));
 
         }
 
@@ -55,16 +55,16 @@ class Validator {
 
 
     private function typed($param){
-        if (!$this->existError($name)) {
+        if (!$this->existError($param['name'])) {
             $name = $param['name'];
             $type = $param['type'];
 
-            $value = method($name); 
+            $value = $this->method($name); 
 
-            if (allowedType($type)) {
+            if ($this->allowedType($type)) {
                 $validType = "is_".$type;
 
-                if (!$validType($type)){
+                if (!$validType($value)){
                    $this->putError($param, "different type(" . $type . ")"); 
                 }
 
@@ -98,7 +98,7 @@ class Validator {
                 $lenght = $value;
             }
 
-            if (!$sizeValid($param)) {
+            if (!$this->sizeValid($min, $max, $lenght)) {
                 $this->putError($param, "Out of range(max=$max, min=$min)");
             }
 
@@ -106,14 +106,14 @@ class Validator {
     }
 
 
-    public function sizeValid(int $lenght):bool {
+    public function sizeValid(int $min, int $max, int $lenght):bool {
 
         return $lenght >= $min && $lenght <= $max;
 
     }
 
     private function existError($paramName):bool{
-        return isset(errors[$paramName]);
+        return isset($this->errors[$paramName]);
     }
 
 
@@ -131,21 +131,14 @@ class Validator {
     }
 
 
+    private function method($paramName) {
+        if ($this->method == "post") {
+            $this->post($paramName);
+        }
 
-
+    }
     private function post($paramName){
-        return $_POST[$name];
+        return $_POST[$paramName];
     }
 
 }
-
-$name = [
-    "name" => 'name',
-    'message' => 'default',
-    'type'=> 'string',
-    'max'=> 5,
-    'min'=> 10
-];
-
-$params = [$name,];
-
