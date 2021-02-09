@@ -155,7 +155,6 @@ class Validator {
     }
 
 
-
     public function putError($param, $messageExtra=""){
         $name = $param['name'];
         $message = isset($param['message']) ? $param['message'] : null;
