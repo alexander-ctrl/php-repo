@@ -27,11 +27,11 @@ class InsertSql extends Sql{
             foreach($this->fields as $key => $value){
                 if (($i + 1) == $countFields ) {
                     $sqlA .= $key;
-                    $sqlB .= ":" . $value;
+                    $sqlB .= ":" . $key;
 
                 } else {
                     $sqlA .= $key . ", ";
-                    $sqlB .= ":" . $value . ", ";
+                    $sqlB .= ":" . $key. ", ";
                 }
                 $i++;
             }
