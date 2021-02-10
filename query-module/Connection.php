@@ -18,6 +18,7 @@ class Connection {
         $this->host = "localhost";
         $this->port = 3306; 
         $this->database = "ventas";
+        $this->createUrl();
     }
 
     private function createUrl()
@@ -32,11 +33,10 @@ class Connection {
            try{
                $this->connection = new PDO($this->url, $this->user, $this->password);
                $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-               
 
            } catch(PDOException $e) {
                $this->error[] = "Error: " . time() . "->" . $e->getMessage();
-               return false;
+               return null;
            }
        } 
 

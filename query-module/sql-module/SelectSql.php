@@ -22,7 +22,6 @@ class SelectSql extends Sql {
                 } else {
                     $sql .= $this->columns[$i] . ", "; 
                 }
-
             }
         }
 

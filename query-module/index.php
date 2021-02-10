@@ -15,17 +15,42 @@
         $query = new MysqslQuery($cn);
 
         echo "Select<br>";
-        $query->select("users", ['name', 'lastname']);
+        $result = $query->select("users", ['name', 'lastname']);
+        echo "<pre>";
+        var_dump($result);
+        echo "</pre>";
 
         echo "<br>";
+        $dataUpdate = [
+            "name" => [
+                "value" => "alexupdate",
+                "type" => "string"
+            ],
+            "lastname" => [
+                "value" => "alexupdate",
+                "type" => "string"
+            ],
+        ];
 
         echo "Update<br>";
-        $query->update("users", ['name' => "alex"]); 
+        $ok = $query->update("users", $dataUpdate); 
+        echo "ok = " . $ok;
 
         echo "<br>";
+        $dataInsert = [
+            "name" => [
+                "value" => "jorge",
+                "type" => "string"
+            ],
+            "lastname" => [
+                "value" => "luis",
+                "type" => "string"
+            ],
+        ];
 
         echo "Insert<br>";
-        $query->insert("users", ["name" => "alex", "lastname"=>"guzguz"]);
+        $ok = $query->insert("users", $dataInsert);
+        echo "ok = " . $ok;
 
     ?>
 </body>
