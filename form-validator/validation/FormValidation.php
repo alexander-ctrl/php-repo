@@ -13,7 +13,7 @@ $params = [
     ],
 
     'email' => [
-        'type' => 'string'
+        'type' => 'email'
     ],
 
     'phone' => [

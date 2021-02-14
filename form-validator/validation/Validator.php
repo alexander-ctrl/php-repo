@@ -10,8 +10,8 @@ class Validator {
     public function __construct(private string $method){
     }
 
-    public function valid(array $params = null): bool{
-        $this->params = $params;
+    public function valid(array &$params = null): bool{
+        $this->params = &$params;
 
         if($params == null) return false;
 
@@ -22,6 +22,8 @@ class Validator {
 
 
     public function correct(): bool{
+        $this->mapValues();
+
         foreach($this->params as $key => $value){
             $param = $value;
             $param['name'] = $key; 
@@ -31,6 +33,7 @@ class Validator {
             $this->typed($param);
             $this->inRange($param);
             $this->filterVars($param);
+            $this->comparators($param);
         }
 
         return count($this->errors) == 0;
@@ -47,7 +50,7 @@ class Validator {
         $definedVar = false;
         
         if ($name != null && $type != null){
-            $result = $this->method($name);
+            $result = $param['value']; 
 
             $definedVar = isset($result) && !empty($result);
 
@@ -61,12 +64,11 @@ class Validator {
 
 
 
+
     private function typed($param){
         if (!$this->existError($param['name'])) {
-            $name = $param['name'];
             $type = $param['type'];
-
-            $value = $this->method($name); 
+            $value = $param['value']; 
 
             if ($this->allowedType($type)){
 
@@ -102,7 +104,7 @@ class Validator {
 
             if($max == null || $min == null) return;
 
-            $value = $this->method($param['name']);
+            $value = $param['value']; 
             $lenght = 0;
 
             if (is_string($value)) {
@@ -133,19 +135,38 @@ class Validator {
 
         if(!$this->existError($param['name'])){
             $name = $param['name'];
-            $value = $this->method($name);
+            $type = $param['type'];
+            $value = $param['value'];
 
-            if ($name == "email"){
+            if ($type== "email"){
                 if(!filter_var($value, FILTER_VALIDATE_EMAIL)){
                     $this->putError($param);
                 }
             }
 
-            if ($name == "url"){
+            if ($type== "url"){
                 if(!filter_var($value, FILTER_VALIDATE_URL)){
                     $this->putError($param);
                 }
             }
+        }
+    }
+
+    private function comparators($param)
+    {
+        if (count($this->errors) == 0) {
+            $paramValue = $param['value']; 
+
+            if (isset($param['equals'])){
+                $otherName = $param['equals'];
+                $otherValue = $this->method($otherName);
+
+                if ($paramValue != $otherValue) {
+                    $this->putError($param, "The fields are different "); 
+                }
+
+            }
+
         }
     }
 
@@ -158,7 +179,7 @@ class Validator {
 
     public function putError($param, $messageExtra=""){
         $name = $param['name'];
-        $message = $param['message'];
+        $message = isset($param['message']) ? $param['message'] : null;
 
         if ($message == null || $message == "default") {
             $message = $this->defaultMessage . " " . $messageExtra;;
@@ -191,4 +212,14 @@ class Validator {
         return $_GET[$paramName];
     }
 
+
+    public function mapValues()
+    {
+        if (count($this->errors) == 0) {
+
+            foreach($this->params as $key => $value){
+                $this->params[$key]['value'] = $this->method($key); 
+            }
+        }
+    }
 }
