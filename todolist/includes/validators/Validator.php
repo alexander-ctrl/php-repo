@@ -6,6 +6,7 @@ class Validator {
     private $params = [];
     private $defaultMessage = "Invalid field";
     private $typesAllowed = ['string', 'double', 'int', 'float'];
+    private $specialTypes = ['email'];
 
     public function __construct(private string $method){
     }
@@ -65,26 +66,47 @@ class Validator {
 
 
 
+    
     private function typed($param){
         if (!$this->existError($param['name'])) {
             $type = $param['type'];
             $value = $param['value']; 
 
             if ($this->allowedType($type)){
+                $value = $this->changeType($value, $type);
 
                 $validType = "is_".$type;
 
                 if (!$validType($value)){
-                   $this->putError($param, "different type(" . $type . ")"); 
+                    $this->putError($param, "different type(" . $type . ")"); 
                 }
 
             } else {
+                if($this->isEspecialType($type)){
+                    return;
+                }
                 $this->putError($param, "type not allowed(" . $type . ")"); 
             }
             
         }
     }
 
+    public function isEspecialType($type)
+    {
+        return in_array($type, $this->specialTypes);
+    }
+
+    public function changeType($value, $type)
+    {
+        $func = $type."val";
+
+        if ($type == 'string'){
+            $func = 'strval';
+        }
+
+        $value = $func($value);
+        return $value;
+    }
 
   
 
@@ -218,8 +240,10 @@ class Validator {
         if (count($this->errors) == 0) {
 
             foreach($this->params as $key => $value){
-                $this->params[$key]['value'] = $this->method($key); 
-                $param['value'] = str_replace(array("/", "\\", ">", "<"), '', $this->method($key)); 
+                $paramvalue = $this->method($key);
+                $paramvalue = preg_replace("^[\\\\/:\*\?\"<>\|]^", " ", $paramvalue) ;
+
+                $this->params[$key]['value'] = $paramvalue; 
             }
         }
     }

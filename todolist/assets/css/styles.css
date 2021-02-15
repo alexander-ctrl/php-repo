@@ -15,7 +15,7 @@
 }
 
 
-input:focus {
+*:focus {
     outline: none;
 }
 
@@ -67,20 +67,22 @@ input:focus {
     margin-bottom: 15px;
 }
 
-/* TASKS */
+/* TASKS  FORM */
 
 .form-task {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-end;
     width: 100%;
     height: auto;
 }
 
-.form-task input {
+.form-task input,
+.form-task textarea {
     display: block;
     width: auto;
+    max-width: 95%;
     height: auto;
     padding: 10px;
     cursor: pointer;
@@ -88,33 +90,37 @@ input:focus {
     font-size: 18px;
 }
 
-.form-task input:first-child {
-    width: 90%;
+.form-task textarea {
+    width: 95%;
+    margin: 10px;
+    margin-right: 0;
     background-color: #eee;
-    border-right: 0px;
     color: #222;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
 }
 
-.form-task input:nth-child(2) {
-    width: 50px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+.form-task input {
+    min-width: 50px;
+    border-radius: 5px;
     background-color: var(--primary-color);
     color: white;
     font-weight: bold;
 }
 
-.form-task input:nth-child(2):hover {
+.form-task input:nth-child(3):hover {
     background-color: var(--accent-color);
 }
 
-.form-task input:nth-child(2):active {
+.form-task input:nth-child(3):active {
     transform: scale(1.1);
 }
 
+.form-task {
+    color: #444;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* TASKS */
 .tasks {
     display: block;
     height: auto;
@@ -126,6 +132,7 @@ input:focus {
     display: flex;
     height: 100%;
     width: 100%;
+    min-width: 100%;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
@@ -135,7 +142,8 @@ input:focus {
 
 .tasks .list .item {
     display: block;
-    width: auto;
+    width: 100%;
+    min-width: 100%;
     min-height: 40px;
     list-style-type: none;
     height: auto;
@@ -148,7 +156,15 @@ input:focus {
 
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
+}
+
+.tasks .list .item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.tasks .options img {
+    justify-self: flex-end;
 }
 
 .tasks .options img {
@@ -166,6 +182,18 @@ input:focus {
     transform: scale(1);
 }
 
+.tasks .task .date {
+    color: #555;
+    display: block;
+    padding-top: 20px;
+    padding-bottom: 0px;
+}
+
+.task {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
 /* FOOTER */
 

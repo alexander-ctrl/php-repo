@@ -15,26 +15,34 @@
     <section class="container">
         <div class="task-wrapper">
             <!-- New Task -->
-            <form action="#" class="form-task">
-                <input type="text"><input type="submit" value="+">
+            <form action="index.php" class="form-task">
+                <h3>Nueva tarea</h3>
+                <textarea name="description" id="task" cols="30" rows="5"></textarea>
+                <input type="submit" value="+">
+                <input type="hidden" name="c" value="task">
+                <input type="hidden" name="m" value="save">
             </form>
 
             <!-- Task section -->
             <section class="tasks">
                 <div class="list">
+                <?php foreach($tasks as $task): ?>
                     <div class="item">
-                        <p>
-                            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quod autem, deserunt odio dolore porro minus maxime eos eligendi officiis labore! Non quod tempore cupiditate error voluptatem eos culpa quae. Natus!
-                        </p>
+                        <div class="task">
+                            <p>
+                                <?= $task['description'] ?>
+                            </p>
+                            <span class="date"><?= $task['date_added'] ?></span>
+                        </div>
+
                         <div class="options">
-                            <img src="assets/img/trash-icon.png"/>
-                            <img src="assets/img/update-icon.png"/>
+                            <a href="index.php?c=task&m=delete&id=<?= $task['id']?>"><img src="assets/img/trash-icon.png"/></a>
+                            <a href="index.php?c=task&m=updateForm&id=<?= $task['id']?>"><img src="assets/img/update-icon.png"/></a>
                         </div>
                     </div>
+                <?php endforeach; ?>
                 </div>
-
             </section>
-
         </div>
     </section>
     <footer id="footer">
