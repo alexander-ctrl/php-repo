@@ -1,8 +1,5 @@
 <?php
 
-// Conectar a la base de datos
-// AUTHOR: alexander guzman
-
 class Connection {
 
     private $user, $password, $url, $database, $port, $host;

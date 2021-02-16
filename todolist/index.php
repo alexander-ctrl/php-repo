@@ -14,7 +14,9 @@ if (!empty($controller) && class_exists($classname)) {
         $objController->$method();
 
     } else {
-        header("Location: index.php");
+        header("Location: index.php?c=view&m=home");
     }
 
+} else {
+    header("Location: index.php?c=view&m=home");
 }

@@ -21,12 +21,9 @@ class TaskController {
             $task->setDescription($dataInsert['description']['value']);
             $task->setDate(date("Y-m-d"));
 
-            $saved = $task->save();
-
+            $task->save();
             header("Location: index.php?c=view&m=home");
 
-        } else {
-            header("Location: index.php?c=view&m=home");
         }
 
     }
@@ -98,6 +95,7 @@ class TaskController {
             $task->setId($id);
             $task->setDescription($expected['description']['value']);
             $task->update();
+
 
             header("Location: index.php?c=view&m=home");
         }else {

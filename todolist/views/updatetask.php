@@ -23,7 +23,6 @@
                 <input type="hidden" name="c" value="task">
                 <input type="hidden" name="m" value="update">
             </form>
-
         </div>
     </section>
     <footer id="footer">

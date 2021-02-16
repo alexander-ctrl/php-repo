@@ -4,6 +4,7 @@ require_once "includes/query/sql/InsertSql.php";
 require_once "includes/query/sql/SelectSql.php";
 require_once "includes/query/sql/UpdateSql.php";
 require_once "includes/query/sql/DeleteSql.php";
+require_once "includes/query/sql/Where.php";
 require_once "Query.php";
 
 
@@ -15,7 +16,7 @@ class MysqslQuery extends Query{
         parent::__construct($connection);
     }
 
-    public function select(string $tablename, array $columns):array
+    public function select(string $tablename, array $columns = []):array
     {
         $result = array();
 
@@ -33,25 +34,36 @@ class MysqslQuery extends Query{
         return $result;
     }
 
-    public function update(string $tablename, array $fields)
+
+
+
+    public function update(string $tablename, array $fields, int $id)
     {
         $allGood = false;
-        $sqlobj = new UpdateSql($tablename, $fields);
-        $resultSql = $sqlobj->generate();
+        $updateOb = new UpdateSql($tablename, $fields);
+        $resultSql = $updateOb->generate();
+
+        $whereOb = new Where("id:=:$id");
+        $resultSql .= $whereOb->generate();
 
         $cn = $this->connection->connect(); 
 
-        echo $resultSql;
         if ($cn != null) {
             $pst = $cn->prepare($resultSql);
             foreach($fields as $fieldname => $values){
                 $pst->bindParam(":$fieldname", $values['value'], PDO::PARAM_STR);
             }
+
+            $pst->bindParam(":id", $id, PDO::PARAM_INT);
             $allGood = $pst->execute();
         }
 
         return $allGood;
     }
+
+
+
+
 
 
     public function insert($tablename, $fields)
@@ -77,6 +89,10 @@ class MysqslQuery extends Query{
         return $allGood;
     }
 
+
+
+
+
     public function delete(string $tablename, array $identifiers)
     {
         $allGood = false;
@@ -98,5 +114,31 @@ class MysqslQuery extends Query{
 
         return $allGood;
 
+    }
+
+
+
+    public function getById($tablename, $columns = [], int $id)
+    {
+        
+        $result = array();
+
+        $selectOb = new SelectSql($tablename, $columns);
+        $resultSql = $selectOb->generate();
+
+        $whereOb = new Where("id:=:$id");
+        $resultSql .= $whereOb->generate();
+
+        $cn = $this->connection->connect(); 
+
+        if ($cn != null) {
+            $pst = $cn->prepare($resultSql);
+            $pst->bindParam(":id", $id, PDO::PARAM_INT);
+
+            $pst->execute();
+            $result = $pst->fetch(\PDO::FETCH_ASSOC); 
+        }
+
+        return $result;
     }
 }

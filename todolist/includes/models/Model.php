@@ -11,7 +11,6 @@ abstract class Model {
     public function __construct()
     {
         $this->cn = new Connection();
-
         $this->mysql = new MysqslQuery($this->cn);
 
     }

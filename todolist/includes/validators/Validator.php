@@ -16,25 +16,23 @@ class Validator {
 
         if($params == null) return false;
 
-        return $this->correct();
+        return $this->validFields();
 
     }
 
 
 
-    private function correct(): bool{
+    private function validFields(): bool{
         $this->mapValues();
 
         foreach($this->params as $key => $value){
             $param = $value;
             $param['name'] = $key; 
 
-            // Puede cambiarse por clases
-            $this->defined($param);
-            $this->typed($param);
-            $this->inRange($param);
+            $this->definedField($param);
+            $this->validDataType($param);
+            $this->fieldInRange($param);
             $this->filterVars($param);
-            $this->comparators($param);
         }
 
         return count($this->errors) == 0;
@@ -44,20 +42,37 @@ class Validator {
 
 
 
+    private function mapValues()
+    {
+        if (count($this->errors) == 0) {
 
-    private function defined($param){
+            foreach($this->params as $key => $value){
+                $paramvalue = $this->method($key);
+                $paramvalue = preg_replace("^[\\\\/:\*\"<>\|]^", " ", $paramvalue) ;
+
+                $this->params[$key]['value'] = $paramvalue; 
+            }
+        }
+    }
+
+
+
+
+
+    private function definedField($param){
         $name = isset($param['name']) ? $param['name']: null;
         $type = isset($param['type']) ? $param['type']: null;
-        $definedVar = false;
+
+        $definedField = false;
         
         if ($name != null && $type != null){
-            $result = $param['value']; 
+            $field = $param['value']; 
 
-            $definedVar = isset($result) && !empty($result);
+            $definedField = isset($field) && !empty($field);
 
         }
 
-        if (!$definedVar){
+        if (!$definedField){
             $this->putError($param, "undefined");
         }
     }
@@ -67,7 +82,7 @@ class Validator {
 
 
     
-    private function typed($param){
+    private function validDataType($param){
         if (!$this->existError($param['name'])) {
             $type = $param['type'];
             $value = $param['value']; 
@@ -78,18 +93,35 @@ class Validator {
                 $validType = "is_".$type;
 
                 if (!$validType($value)){
-                    $this->putError($param, "different type(" . $type . ")"); 
+                    $this->putError($param, "El tipo de dato no es valido(" . $type . ")"); 
                 }
 
             } else {
                 if($this->isEspecialType($type)){
                     return;
                 }
-                $this->putError($param, "type not allowed(" . $type . ")"); 
+                $this->putError($param, "Tipo de dato no permitido(" . $type . ")"); 
             }
             
         }
     }
+
+
+
+
+
+
+    private function allowedType($type): bool
+    {
+        $result = array_search($type, $this->typesAllowed);
+        return isset($result); 
+    }
+
+
+
+
+
+
 
     public function isEspecialType($type)
     {
@@ -110,15 +142,11 @@ class Validator {
 
   
 
-    private function allowedType($type): bool{
-        $result = array_search($type, $this->typesAllowed);
-        return isset($result); 
-    }
-
 
     
 
-    private function inRange($param){
+    private function fieldInRange($param)
+    {
         if (!$this->existError($param['name'])) {
 
             $max = isset($param['max']) ? $param['max']: null;
@@ -138,7 +166,7 @@ class Validator {
             }
 
             if (!$this->sizeValid($min, $max, $lenght)) {
-                $this->putError($param, "Out of range(max=$max, min=$min)");
+                $this->putError($param, "Fuera de rango(max=$max, min=$min)");
             }
 
         }
@@ -147,50 +175,34 @@ class Validator {
 
 
 
-    private function sizeValid(int $min, int $max, int $lenght):bool {
+    private function sizeValid(int $min, int $max, int $lenght):bool 
+    {
         return $lenght >= $min && $lenght <= $max;
     }
 
 
 
-    private function filterVars($param){
-
-        if(!$this->existError($param['name'])){
-            $name = $param['name'];
+    
+    private function filterVars($param)
+    { 
+    if(!$this->existError($param['name'])){
             $type = $param['type'];
             $value = $param['value'];
 
             if ($type== "email"){
                 if(!filter_var($value, FILTER_VALIDATE_EMAIL)){
-                    $this->putError($param);
+                    $this->putError($param, "El correo no es valido: $value");
                 }
             }
 
             if ($type== "url"){
                 if(!filter_var($value, FILTER_VALIDATE_URL)){
-                    $this->putError($param);
+                    $this->putError($param, "La url no es valida: $value");
                 }
             }
         }
     }
 
-    private function comparators($param)
-    {
-        if (count($this->errors) == 0) {
-            $paramValue = $param['value']; 
-
-            if (isset($param['equals'])){
-                $otherName = $param['equals'];
-                $otherValue = $this->method($otherName);
-
-                if ($paramValue != $otherValue) {
-                    $this->putError($param, "The fields are different "); 
-                }
-
-            }
-
-        }
-    }
 
 
     private function existError($paramName):bool{
@@ -199,7 +211,7 @@ class Validator {
 
 
 
-    private function putError($param, $messageExtra=""){
+    private function putError(array $param, $messageExtra=""){
         $name = $param['name'];
         $message = isset($param['message']) ? $param['message'] : null;
 
@@ -210,7 +222,7 @@ class Validator {
         $this->errors[$name] = $message; 
     }
 
-    private function getErrors():array{
+    public function getErrors():array{
         return $this->errors;
     }
 
@@ -232,19 +244,5 @@ class Validator {
     
     private function get($paramName){
         return $_GET[$paramName];
-    }
-
-
-    private function mapValues()
-    {
-        if (count($this->errors) == 0) {
-
-            foreach($this->params as $key => $value){
-                $paramvalue = $this->method($key);
-                $paramvalue = preg_replace("^[\\\\/:\*\?\"<>\|]^", " ", $paramvalue) ;
-
-                $this->params[$key]['value'] = $paramvalue; 
-            }
-        }
     }
 }

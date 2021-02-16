@@ -37,12 +37,12 @@ class Task extends Model{
     }
 
     public function getAll():array {
-        return $this->mysql->select("tasks", []); 
+        return $this->mysql->select("tasks"); 
     } 
 
     public function save()
     {  
-        $dataUpdate = [
+        $insertData = [
             "description" => [
                 "value" => $this->getDescription(),
                 "type" => "string"
@@ -53,7 +53,7 @@ class Task extends Model{
             ]
         ];
 
-        return $this->mysql->insert("tasks", $dataUpdate);
+        return $this->mysql->insert("tasks", $insertData);
     } 
 
     public function delete(int $id) 
@@ -63,7 +63,7 @@ class Task extends Model{
 
     public function update()
     {
-        $dataInsert = [
+        $updateData = [
 
             "description" => [
                 "value" => $this->getDescription(),
@@ -71,20 +71,13 @@ class Task extends Model{
             ] 
         ];
 
-        return $this->mysql->update("tasks", $dataInsert);
+        return $this->mysql->update("tasks", $updateData, $this->getId());
     }
 
     public function getById($id):array
     {
-        $tasks = $this->mysql->select("tasks", []); 
-        $result = [];
-        foreach($tasks as $task) {
-            if ($task['id'] == $id) {
-                $result = $task;
-                return $result;
-            }
-        }
-
-        return $result;
+        $task = $this->mysql->getById("tasks", id:$id); 
+       
+        return $task;
     }
 }
