@@ -18,7 +18,10 @@
             <form action="index.php" class="form-task">
                 <h3>Nueva tarea</h3>
                 <textarea name="description" id="task" cols="30" rows="5"></textarea>
-                <input type="submit" value="+">
+                <div class="wrap-option">
+                    <input type="date" name="date_finish"> 
+                    <input type="submit" value="+">
+                </div>
                 <input type="hidden" name="c" value="task">
                 <input type="hidden" name="m" value="save">
             </form>
@@ -27,19 +30,47 @@
             <section class="tasks">
                 <div class="list">
                 <?php foreach($tasks as $task): ?>
+                    <?php if(!$task['finished']):  ?>
                     <div class="item">
                         <div class="task">
                             <p>
                                 <?= $task['description'] ?>
                             </p>
-                            <span class="date"><?= $task['date_added'] ?></span>
+
+                            <div class="date-wrap">
+                                <span class="date date-info">
+                                    Agregada:<?= $task['date_added'] ?>
+                                </span>
+
+                                <?php 
+                                    $date_finish = $task['date_finish'];
+
+                                    $timeFinish = strtotime($date_finish);
+                                    $timeNow = time(); 
+
+                                if($timeNow >= $timeFinish):
+                                ?>
+                                    <span class="date date-danger">
+                                        Finaliza:<?= $task['date_finish'] ?>
+                                    </span>
+                                <?php endif;?>
+
+                                <?php if($timeNow < $timeFinish):?>
+                                    <span class="date date-green">
+                                        Finaliza:<?= $task['date_finish'] ?>
+                                    </span>
+
+                                <?php endif;?>
+                            </div>
                         </div>
 
                         <div class="options">
                             <a href="index.php?c=task&m=delete&id=<?= $task['id']?>"><img src="assets/img/trash-icon.png"/></a>
                             <a href="index.php?c=task&m=updateForm&id=<?= $task['id']?>"><img src="assets/img/update-icon.png"/></a>
+                            <a href="index.php?c=task&m=finish&id=<?= $task['id']?>"><img src="assets/img/checkmark.png"/></a>
                         </div>
                     </div>
+                    <?php endif;?>
                 <?php endforeach; ?>
                 </div>
             </section>

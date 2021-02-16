@@ -5,8 +5,8 @@ class Validator {
     private $errors = [];
     private $params = [];
     private $defaultMessage = "Invalid field";
-    private $typesAllowed = ['string', 'double', 'int', 'float'];
-    private $specialTypes = ['email'];
+    private $typesAllowed = ['string', 'double', 'int', 'float', 'bool'];
+    private $specialTypes = ['email', 'date'];
 
     public function __construct(private string $method){
     }
@@ -113,8 +113,7 @@ class Validator {
 
     private function allowedType($type): bool
     {
-        $result = array_search($type, $this->typesAllowed);
-        return isset($result); 
+        return array_search($type, $this->typesAllowed) !== false;
     }
 
 
@@ -198,6 +197,20 @@ class Validator {
             if ($type== "url"){
                 if(!filter_var($value, FILTER_VALIDATE_URL)){
                     $this->putError($param, "La url no es valida: $value");
+                }
+            }
+
+            if ($type== "date") {
+                $time = strtotime($value);
+                $year = date("Y", $time); 
+                $month = date("m", $time); 
+                $day = date("d", $time); 
+
+                if (!checkdate($month, $day, $year)){
+                    $this->putError($param, "La fecha no es valida: $value");
+
+                } else {
+                    $this->params[$param['name']]['value'] = "$year/$month/$day";
                 }
             }
         }

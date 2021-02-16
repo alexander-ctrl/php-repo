@@ -19,7 +19,11 @@
                 <h3>Actualizar tarea</h3>
                 <textarea name="description" id="task" cols="30" rows="5"><?= $task['description']?> </textarea>
                 <input type="hidden" name="id" value="<?= $task['id'] ?>">
-                <input type="submit" value="Actualizar">
+                <div class="wrap-option">
+                    <input type="date" name="date_finish" value="<?= $task['date_finish']?>"> 
+                    <input type="submit" value="Actualizar">
+                </div>
+
                 <input type="hidden" name="c" value="task">
                 <input type="hidden" name="m" value="update">
             </form>

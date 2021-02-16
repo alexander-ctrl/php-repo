@@ -99,19 +99,20 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-.form-task input {
+.form-task input[type="submit"] {
     min-width: 50px;
     border-radius: 5px;
     background-color: var(--primary-color);
     color: white;
     font-weight: bold;
+    margin-left: 10px;
 }
 
-.form-task input:nth-child(3):hover {
+.form-task input[type="submit"]:nth-child(3):hover {
     background-color: var(--accent-color);
 }
 
-.form-task input:nth-child(3):active {
+.form-task input[type="submit"]:nth-child(3):active {
     transform: scale(1.1);
 }
 
@@ -120,9 +121,19 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+.wrap-option {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+
+}
+
 /* TASKS */
 .tasks {
     display: block;
+    width: 100%;
     height: auto;
     margin: 0;
     margin-top: 20px;
@@ -183,10 +194,31 @@
 }
 
 .tasks .task .date {
+    width: auto;
     color: #555;
     display: block;
-    padding-top: 20px;
     padding-bottom: 0px;
+    padding: 5px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+.date-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tasks .task .date.date-green {
+    color: rgb(13, 156, 13);
+    border: solid 1px rgb(13, 156, 13);
+}
+
+.tasks .task .date.date-danger {
+    color: rgb(173, 25, 25);
+    border: solid 1px rgb(173, 25, 25);
+
 }
 
 .task {

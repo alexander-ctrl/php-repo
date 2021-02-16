@@ -12,6 +12,9 @@ class TaskController {
         $dataInsert = [
             "description" => [
                 "type" => "string",
+            ],
+            "date_finish"=> [
+                "type" => "date"
             ]
         ];
 
@@ -20,8 +23,11 @@ class TaskController {
             $task = new Task();
             $task->setDescription($dataInsert['description']['value']);
             $task->setDate(date("Y-m-d"));
+            $task->setDateFinish($dataInsert['date_finish']['value']);
 
             $task->save();
+            header("Location: index.php?c=view&m=home");
+        } else {
             header("Location: index.php?c=view&m=home");
 
         }
@@ -84,6 +90,9 @@ class TaskController {
             ],
             "description" => [
                 "type" => "string"
+            ],
+            "date_finish" => [
+                "type" => "date"
             ]
         ];
 
@@ -94,8 +103,32 @@ class TaskController {
             $task = new Task();
             $task->setId($id);
             $task->setDescription($expected['description']['value']);
+            $task->setDateFinish($expected['date_finish']['value']);
             $task->update();
 
+
+            header("Location: index.php?c=view&m=home");
+        }else {
+            header("Location: index.php?c=view&m=home");
+        }  
+    }
+
+    public function finish()
+    {
+        $expected = [
+            "id" => [
+                "type" => "int"
+            ]
+        ];
+
+        $validator = new Validator("get");
+        if ($validator->valid($expected)) {
+            $id = $expected['id']['value']; 
+
+            $task = new Task();
+            $task->setId($id);
+            $task->setFinished(true);
+            $task->update();
 
             header("Location: index.php?c=view&m=home");
         }else {
