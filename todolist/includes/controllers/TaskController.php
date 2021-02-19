@@ -39,7 +39,21 @@ class TaskController {
         $task = new Task();
         $tasks = $task->getAll();
 
+        $count = $this->countTasks($tasks);
+
         include_once "views/tasks.php";
+    }
+
+    public function countTasks($tasks)
+    {
+        $count = 0;
+        foreach($tasks as $task){
+            if (!$task['finished']){
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     public function delete()

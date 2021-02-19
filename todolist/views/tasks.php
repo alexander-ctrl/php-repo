@@ -28,6 +28,8 @@
 
             <!-- Task section -->
             <section class="tasks">
+                <span class="text-info">Tasks: <?= $count ?></span>
+
                 <div class="list">
                 <?php foreach($tasks as $task): ?>
                     <?php if(!$task['finished']):  ?>
